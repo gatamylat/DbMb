@@ -4,12 +4,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#FAF9F5">
-<link rel="manifest" href="./manifest.json">
 <title>Massivburg · Dashboard</title>
-<meta name="build-version" content="202606201642">
+<meta name="build-version" content="202606201730">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
@@ -289,18 +286,11 @@ transform:scaleX(0);opacity:0;transition:opacity .2s}
 #loadbar.on{opacity:1;animation:lb 1.5s ease-in-out infinite}
 @keyframes lb{0%{transform:scaleX(0)}60%{transform:scaleX(.8)}100%{transform:scaleX(1);opacity:0}}
 
-/* ── OFFLINE BANNER ── */
-#offline-banner{display:none;position:fixed;top:0;left:0;right:0;z-index:500;
-background:var(–warn);color:#fff;font-size:11px;font-weight:600;
-text-align:center;padding:6px 16px;letter-spacing:.3px}
-#offline-banner.on{display:block}
 </style>
-
 </head>
 <body>
 
 <div id="loadbar"></div>
-<div id="offline-banner">Офлайн · показаны кэшированные данные</div>
 
 <!-- ══ SETUP SCREEN ══ -->
 
@@ -614,22 +604,8 @@ async function pfFetchAll(templateId) {
 function saveCache(data) { LS.setJSON('pf_last_data', { data, ts: Date.now() }); }
 function loadCache() { return LS.getJSON('pf_last_data'); }
 
-function showOffline(ts) {
-  const b = document.getElementById('offline-banner');
-  b.textContent = ts
-    ? `Офлайн · данные ${fmtCacheAge(ts)}`
-    : 'Офлайн · кэшированные данные';
-  b.classList.add('on');
-}
-function hideOffline() {
-  document.getElementById('offline-banner').classList.remove('on');
-}
-function fmtCacheAge(ts) {
-  const d = Math.floor((Date.now()-ts)/60000);
-  if (d < 1) return 'только что';
-  if (d < 60) return `${d} мин назад`;
-  return `${Math.floor(d/60)} ч назад`;
-}
+function showOffline(ts) { console.log('[Offline] cached data from', ts); }
+function hideOffline() {}
 
 /* ════════════════════════════════════════════
    REFRESH ALL
@@ -1258,18 +1234,7 @@ document.getElementById('btn-save-pf').addEventListener('click', savePFToken);
 document.getElementById('btn-save-claude').addEventListener('click', saveClaudeKey);
 document.getElementById('btn-reset').addEventListener('click', resetAll);
 
-/* ════════════════════════════════════════════
-   SERVICE WORKER
-════════════════════════════════════════════ */
-if ('serviceWorker' in navigator) {
-  try {
-    if (window === window.top) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
-    }
-  } catch(e) {}
-}
+
 
 /* ════════════════════════════════════════════
    INIT
